@@ -1,0 +1,72 @@
+# Virtual Environment
+env/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment Variables
+.env
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Logs
+*.log
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# LangSmith
+.langsmith/
+
+# ChromaDB
+chroma_db/
+chroma/
+
+# FAISS
+*.faiss
+*.index
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Ollama generated files
+models/
+
+# Temporary files
+temp/
+tmp/
+cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Testing
+.pytest_cache/
+
+# Secrets
+secrets.json
+credentials.json
+
+# Generated documents
+*.pdf
+*.docx
+.env.example
