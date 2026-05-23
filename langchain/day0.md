@@ -28,3 +28,4 @@
 - These connect applications to external data sources (e.g., PDFs, databases). It involves four sub-components: Document Loaders, Text Splitters, Vector Stores, and Retrievers to enable semantic search over private data.
 6. Agents 
 - These are LLMs with reasoning capabilities and access to external tools. An Agent can decide which tool to call to complete a task (e.g., using a calculator or a weather API) to perform actions beyond just generating text.
+
