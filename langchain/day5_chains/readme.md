@@ -1,110 +1,147 @@
-````md
-# LangChain Chains
+# Day 5 — Chains
 
-## Keywords
+## What is a Chain?
 
-- Chain
-- LCEL
-- Pipe Operator (|)
-- Sequential Chain
-- Parallel Chain
-- RunnableParallel
-- Conditional Chain
-- RunnableBranch
+A Chain is a pipeline where the output of one step becomes the input of the next step.
 
 ---
 
-# What is a Chain?
-
-A pipeline.
+Without Chain
 
 ```text
-Input
-↓
 Prompt
-↓
+ ↓
 LLM
-↓
-Parser
-↓
+ ↓
+Output
+
+(Manually pass output)
+
+ ↓
+
+Prompt
+ ↓
+LLM
+ ↓
 Output
 ```
 
-Output of one step becomes input of next step.
+Lots of manual work.
+
+---
+
+With Chain
+
+```text
+Prompt
+ ↓
+LLM
+ ↓
+Parser
+ ↓
+Output
+```
+
+Everything connected automatically.
 
 ---
 
 # Why Chains?
 
-Without Chains:
+Chains help combine multiple AI operations into a single workflow.
+
+Benefits:
 
 ```text
-Manual Step 1
-↓
-Manual Step 2
-↓
-Manual Step 3
+Cleaner Code
+Reusable Logic
+Complex Workflows
+Less Boilerplate
 ```
-
-With Chains:
-
-```text
-Single Pipeline
-```
-
-Cleaner and reusable.
 
 ---
 
 # LCEL
 
-LangChain Expression Language.
+LangChain Expression Language
 
-Uses:
+Allows chaining using:
 
 ```python
 |
 ```
 
-to connect components.
+(pipe operator)
 
 ---
 
-# Pipe Operator
-
-Example
+# Basic Chain
 
 ```python
 chain = prompt | llm | parser
 ```
 
-Flow
+Flow:
 
 ```text
 Prompt
-↓
+ ↓
 LLM
-↓
+ ↓
 Parser
 ```
 
 ---
 
-# Simple Chain
+Invoke
 
 ```python
-chain = prompt | llm | parser
-
-result = chain.invoke({
-    "topic": "RAG"
+response = chain.invoke({
+    "topic": "LangChain"
 })
 ```
 
 ---
 
-# Sequential Chain
+# Visualizing LCEL
 
-Multiple LLM steps.
+Instead of:
+
+```python
+prompt_value = prompt.invoke(...)
+response = llm.invoke(prompt_value)
+final = parser.invoke(response)
+```
+
+Use:
+
+```python
+chain = prompt | llm | parser
+```
+
+Cleaner.
+
+---
+
+# 1. Simple Chain
+
+Single straight pipeline.
+
+---
+
+Flow
+
+```text
+Input
+ ↓
+Prompt
+ ↓
+LLM
+ ↓
+Parser
+ ↓
+Output
+```
 
 ---
 
@@ -112,20 +149,62 @@ Example
 
 ```text
 Topic
-↓
-Generate Report
-↓
-Summarize Report
-↓
-Final Answer
+ ↓
+Generate Explanation
+ ↓
+Return Text
 ```
 
 ---
 
-Code Idea
+Code
 
 ```python
-chain = report_chain | summary_chain
+chain = prompt | llm | StrOutputParser()
+```
+
+---
+
+# 2. Sequential Chain
+
+Multiple LLM steps.
+
+---
+
+Flow
+
+```text
+Input
+ ↓
+Generate Report
+ ↓
+Summarize Report
+ ↓
+Final Output
+```
+
+---
+
+Visual
+
+```text
+LLM 1
+ ↓
+LLM 2
+ ↓
+LLM 3
+```
+
+---
+
+Example
+
+```text
+Blog Topic
+ ↓
+Generate Blog
+ ↓
+Summarize Blog
 ```
 
 ---
@@ -133,14 +212,14 @@ chain = report_chain | summary_chain
 Use Cases
 
 ```text
-Blog Writing
-Research
+Research Assistant
+Content Generation
 Report Generation
 ```
 
 ---
 
-# Parallel Chain
+# 3. Parallel Chain
 
 Run multiple chains simultaneously.
 
@@ -154,16 +233,37 @@ RunnableParallel
 
 ---
 
-Example
+Flow
 
 ```text
 Document
-↓
-├── Notes
-└── Quiz
-↓
-Merge Results
+      ↓
+ ┌────┼────┐
+ ↓    ↓    ↓
+Notes Quiz Summary
+      ↓
+ Merge
 ```
+
+---
+
+Example
+
+Input:
+
+```text
+Chapter
+```
+
+Outputs:
+
+```text
+Notes
+Quiz
+Flashcards
+```
+
+at the same time.
 
 ---
 
@@ -178,7 +278,7 @@ RunnableParallel(
 
 ---
 
-Advantages
+Benefits
 
 ```text
 Faster
@@ -187,19 +287,9 @@ Independent Tasks
 
 ---
 
-Use Cases
+# 4. Conditional Chain
 
-```text
-Study Assistant
-Content Generation
-Document Processing
-```
-
----
-
-# Conditional Chain
-
-Decision Making.
+Adds decision making.
 
 ---
 
@@ -215,12 +305,29 @@ Flow
 
 ```text
 Input
-↓
-Condition Check
-↓
-Choose Path
-↓
-Output
+ ↓
+Condition
+ ↓
+Route
+```
+
+---
+
+Visual
+
+```text
+Feedback
+ ↓
+
+Positive?
+  │
+ ├── Yes
+ │      ↓
+ │  Thank User
+ │
+ └── No
+        ↓
+     Apologize
 ```
 
 ---
@@ -228,100 +335,62 @@ Output
 Example
 
 ```text
-Feedback
-↓
-Positive?
-↓
-Yes → Thank User
-
-No → Apology Response
+Customer Support
 ```
 
----
-
-Code Idea
-
-```python
-RunnableBranch(
-    (condition, positive_chain),
-    negative_chain
-)
-```
+Different response depending on sentiment.
 
 ---
 
 Use Cases
 
 ```text
+Routing
+Classification
 Customer Support
-AI Agents
-Routing Queries
+Agents
 ```
 
 ---
 
-# Chain Types
+# Chain Types Summary
 
-## Simple Chain
-
-```text
-Linear Flow
-```
+## Simple
 
 ```text
-Prompt
-↓
-LLM
-↓
-Parser
+A → B → C
 ```
 
 ---
 
-## Sequential Chain
+## Sequential
 
 ```text
-Multiple Steps
-```
-
-```text
-LLM 1
-↓
-LLM 2
-↓
-LLM 3
+LLM → LLM → LLM
 ```
 
 ---
 
-## Parallel Chain
+## Parallel
 
 ```text
-Multiple Paths Together
+      Input
+         ↓
+   A    B    C
+         ↓
+      Merge
 ```
+
+---
+
+## Conditional
 
 ```text
 Input
-↓
-A
-B
-C
-↓
-Merge
-```
-
----
-
-## Conditional Chain
-
-```text
-Decision Based
-```
-
-```text
-If
-Else
-Routing
+ ↓
+Decision
+ ↓
+Route
 ```
 
 ---
@@ -334,6 +403,16 @@ Routing
 Simple Chain
 ```
 
+```text
+Resume
+ ↓
+Prompt
+ ↓
+LLM
+ ↓
+Parser
+```
+
 ---
 
 ## Blog Generator
@@ -343,11 +422,11 @@ Sequential Chain
 ```
 
 ```text
-Generate
-↓
-Improve
-↓
-Summarize
+Topic
+ ↓
+Write Blog
+ ↓
+Summarize Blog
 ```
 
 ---
@@ -359,6 +438,8 @@ Parallel Chain
 ```
 
 ```text
+Chapter
+ ↓
 Notes
 Quiz
 Flashcards
@@ -366,76 +447,18 @@ Flashcards
 
 ---
 
-## Customer Support
+## Customer Support Bot
 
 ```text
 Conditional Chain
 ```
 
 ```text
-Complaint
-↓
+Feedback
+ ↓
+Positive/Negative
+ ↓
 Different Response
-
-Praise
-↓
-Different Response
-```
-
----
-
-# Interview Revision
-
-Q: What is a Chain?
-
-A:
-
-```text
-Pipeline connecting LangChain components.
-```
-
----
-
-Q: What does | do?
-
-A:
-
-```text
-Connects components in LCEL.
-```
-
----
-
-Q: Sequential vs Parallel?
-
-A:
-
-```text
-Sequential:
-One after another.
-
-Parallel:
-Run simultaneously.
-```
-
----
-
-Q: Which component enables parallel execution?
-
-A:
-
-```text
-RunnableParallel
-```
-
----
-
-Q: Which component enables if-else logic?
-
-A:
-
-```text
-RunnableBranch
 ```
 
 ---
@@ -443,10 +466,18 @@ RunnableBranch
 # Must Remember
 
 ```text
+Chain
+=
+Pipeline
+```
+
+---
+
+```text
 Prompt
-↓
+ ↓
 LLM
-↓
+ ↓
 Parser
 ```
 
@@ -460,9 +491,9 @@ Simple Chain
 
 ```text
 LLM
-↓
+ ↓
 LLM
-↓
+ ↓
 LLM
 ```
 
@@ -476,9 +507,9 @@ Sequential Chain
 
 ```text
 Input
-↓
-Multiple Chains
-↓
+ ↓
+Multiple Tasks
+ ↓
 Merge
 ```
 
@@ -492,9 +523,9 @@ Parallel Chain
 
 ```text
 Input
-↓
+ ↓
 Decision
-↓
+ ↓
 Route
 ```
 
@@ -506,13 +537,76 @@ Conditional Chain
 
 ---
 
+# Interview Revision
+
+## What is a Chain?
+
+A workflow where the output of one component becomes the input of another.
+
+---
+
+## What is LCEL?
+
+LangChain Expression Language.
+
+Uses:
+
+```python
+|
+```
+
+to connect components.
+
+---
+
+## Sequential vs Parallel?
+
+```text
+Sequential:
+One after another
+
+Parallel:
+Run simultaneously
+```
+
+---
+
+## Which component enables parallel execution?
+
+```python
+RunnableParallel
+```
+
+---
+
+## Which component enables decision making?
+
+```python
+RunnableBranch
+```
+
+---
+
 # One Line Summary
 
 ```text
-Chains = Connecting multiple AI operations into reusable workflows.
+Chains connect multiple AI operations into a single reusable workflow.
 ```
 
-This is the first video where LangChain starts looking less like prompting and more like software architecture. Later, LangGraph is basically a much more powerful evolution of these same ideas:
+---
 
-Simple Chain → Sequential → Parallel → Conditional → Agent Workflows → LangGraph.
-````
+# The One Diagram To Remember
+
+```text
+Input
+ ↓
+Prompt
+ ↓
+LLM
+ ↓
+Parser
+ ↓
+Output
+```
+
+Everything else (Sequential, Parallel, Conditional) is just a more advanced version of this.

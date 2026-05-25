@@ -1,49 +1,43 @@
-# LangChain Models
+# Day 1 — Models
 
-## Keywords
+## What are Models?
 
-- Model
-- Language Model
-- Chat Model
-- Embedding Model
-- Temperature
-- Open Source Model
-- Proprietary Model
-- Hugging Face
-- Inference API
-- Local Model
-- Embedding
-- Cosine Similarity
-
----
-
-# Model
+In LangChain, **Models** are the interface used to talk to AI models.
 
 ```text
-Common LangChain interface for interacting with AI models.
-```
-
-Types:
-
-```text
-1. Language Models
-2. Embedding Models
+LangChain
+   ↓
+Model Interface
+   ↓
+LLM / Chat Model / Embedding Model
 ```
 
 ---
 
-# Language Models
-
-Input:
+## Types of Models
 
 ```text
-Text
+Models
+│
+├── Language Models
+│   ├── LLMs
+│   └── Chat Models
+│
+└── Embedding Models
 ```
 
-Output:
+---
+
+# 1. Language Models
+
+Used for text generation.
 
 ```text
-Text
+Text / Messages
+      ↓
+Language Model
+      ↓
+Text / Message Response
 ```
 
 Examples:
@@ -53,112 +47,102 @@ GPT
 Claude
 Gemini
 Llama
+Mistral
+Qwen
 ```
 
 ---
 
-## Chat Model
+## LLM vs Chat Model
 
-Input:
+### LLM
 
 ```text
-Messages
+Text → Text
 ```
 
-Output:
+Older/raw style.
+
+### Chat Model
 
 ```text
-Messages
+Messages → Message
+```
+
+Better for chat apps.
+
+Most modern apps use **Chat Models**.
+
+---
+
+# 2. Using Groq Chat Model
+
+```python
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
+
+load_dotenv()
+
+llm = ChatGroq(
+    model="llama-3.3-70b-versatile",
+    temperature=0.7
+)
+
+response = llm.invoke("Explain LangChain in simple words")
+
+print(response.content)
+```
+
+---
+
+# 3. Temperature
+
+Controls randomness.
+
+```text
+Low temperature  → predictable, factual
+High temperature → creative, random
+```
+
+Use:
+
+```text
+0.0 - 0.3 → RAG, coding, factual answers
+0.7 - 1.0 → stories, ideas, creative writing
 ```
 
 Example:
 
 ```python
-from langchain_groq import ChatGroq
-
-llm = ChatGroq(
-    model="llama-3.3-70b-versatile"
-)
-
-response = llm.invoke("Hello")
-```
-
----
-
-# Temperature
-
-Controls randomness.
-
-```python
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
-    temperature=0.7
+    temperature=0.2
 )
 ```
 
 ---
 
-## Low Temperature
-
-```text
-0 - 0.3
-```
-
-Output:
-
-```text
-More predictable
-More factual
-```
-
-Use:
-
-```text
-Coding
-RAG
-Q&A
-```
-
----
-
-## High Temperature
-
-```text
-0.8 - 1
-```
-
-Output:
-
-```text
-Creative
-Random
-```
-
-Use:
-
-```text
-Stories
-Poetry
-Brainstorming
-```
-
----
-
-# Proprietary Models
-
-Require API key.
+# 4. Closed Source Models
 
 Examples:
 
 ```text
-OpenAI GPT
+OpenAI
 Claude
 Gemini
 ```
 
+Usually need:
+
+```text
+API key
+Internet
+Billing/free quota
+```
+
 ---
 
-# Open Source Models
+# 5. Open Source Models
 
 Examples:
 
@@ -170,154 +154,168 @@ Qwen
 TinyLlama
 ```
 
-Can run:
+Can be used through:
 
 ```text
-Local
 Hugging Face
 Ollama
-```
-
----
-
-# Hugging Face Inference API
-
-Run models hosted on Hugging Face.
-
-```python
-from langchain_huggingface import HuggingFaceEndpoint
-```
-
----
-
-# Local Models
-
-Run directly on your machine.
-
-Examples:
-
-```text
-TinyLlama
-Gemma
-Llama
-Mistral
+Local Machine
 ```
 
 Benefits:
 
 ```text
-No API cost
-Private
-Offline
+Free/local possible
+More control
+Privacy
 ```
 
 ---
 
-# Embedding Models
+# 6. Embedding Models
 
-Input:
+Embedding models convert text into vectors.
 
 ```text
 Text
-```
-
-Output:
-
-```text
-Vector (numbers)
+ ↓
+Embedding Model
+ ↓
+Numbers / Vector
 ```
 
 Example:
 
 ```text
 "I love AI"
-
-↓
-
-[0.12, -0.45, 0.88, ...]
+ ↓
+[0.12, -0.44, 0.91, ...]
 ```
-
----
-
-# Generate Embeddings
-
-```python
-from langchain_huggingface import HuggingFaceEmbeddings
-```
-
----
-
-# Why Embeddings?
 
 Used for:
 
 ```text
-Search
+Semantic Search
+Similarity Search
 RAG
 Recommendations
 Clustering
-Similarity
 ```
 
 ---
 
-# Document Similarity Search
+# 7. Hugging Face Embeddings
 
-Flow:
+```python
+from langchain_huggingface import HuggingFaceEmbeddings
+
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
+
+vector = embeddings.embed_query("What is LangChain?")
+
+print(vector[:5])
+print(len(vector))
+```
+
+---
+
+# 8. Document Similarity
+
+Basic idea:
 
 ```text
 Documents
-↓
+ ↓
 Embeddings
-↓
-Store vectors
-↓
-User Query
-↓
-Convert query to embedding
-↓
-Find similar vectors
-↓
-Return relevant documents
+ ↓
+Vectors
+ ↓
+Compare with query vector
+ ↓
+Most similar document
 ```
 
 ---
 
-# Cosine Similarity
+## Cosine Similarity
 
-Measures similarity between vectors.
-
-Range:
+Used to compare vectors.
 
 ```text
-1   -> identical
-0   -> unrelated
--1  -> opposite
+Higher score = more similar
 ```
 
-Higher score:
+```python
+from sklearn.metrics.pairwise import cosine_similarity
+
+score = cosine_similarity(
+    [query_vector],
+    [document_vector]
+)
+
+print(score)
+```
+
+---
+
+# 9. Mini Similarity Search Example
+
+```python
+from langchain_huggingface import HuggingFaceEmbeddings
+from sklearn.metrics.pairwise import cosine_similarity
+
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
+
+documents = [
+    "LangChain helps build LLM applications.",
+    "Cricket is a popular sport in India.",
+    "RAG connects LLMs with external knowledge."
+]
+
+query = "How do I build apps with language models?"
+
+doc_vectors = embeddings.embed_documents(documents)
+query_vector = embeddings.embed_query(query)
+
+scores = cosine_similarity([query_vector], doc_vectors)[0]
+
+best_index = scores.argmax()
+
+print(documents[best_index])
+print(scores[best_index])
+```
+
+---
+
+# Must Remember
 
 ```text
-More similar
+Language Model = Text → Text
+
+Chat Model = Messages → Message
+
+Embedding Model = Text → Vector
+
+Temperature = Randomness
+
+Cosine Similarity = Vector Similarity
 ```
 
 ---
 
 # Interview Revision
 
-Q: What is a Model in LangChain?
+## What is a model in LangChain?
 
-A:
-
-```text
-Common interface to interact with Language Models and Embedding Models.
-```
+A common interface for interacting with language models and embedding models.
 
 ---
 
-Q: Difference between Language Model and Embedding Model?
-
-A:
+## Language model vs embedding model?
 
 ```text
 Language Model:
@@ -329,67 +327,28 @@ Text → Vector
 
 ---
 
-Q: Difference between LLM and Chat Model?
+## Why embeddings?
 
-A:
-
-```text
-LLM:
-Raw text input/output
-
-Chat Model:
-Message-based input/output
-```
+Because machines cannot compare meaning directly from text, so text is converted into vectors.
 
 ---
 
-Q: What does Temperature control?
+## What is cosine similarity?
 
-A:
-
-```text
-Randomness of output.
-```
+A method to compare how similar two vectors are.
 
 ---
 
-Q: Why are embeddings important?
+## When to use low temperature?
 
-A:
-
-```text
-Used for semantic search and RAG.
-```
+For factual, consistent tasks like RAG, coding, and Q&A.
 
 ---
 
-Q: What is cosine similarity?
-
-A:
+# One Line Summary
 
 ```text
-Measures similarity between embeddings.
-Higher value = more similar.
+Models are where LangChain connects your app to intelligence:
+language models generate text, embedding models create vectors.
 ```
 
----
-
-# Must Remember
-
-```text
-Language Model
-=
-Generate text
-
-Embedding Model
-=
-Generate vectors
-
-Vectors
-=
-Power RAG
-
-Cosine Similarity
-=
-Compare vectors
-```
